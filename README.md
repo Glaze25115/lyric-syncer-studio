@@ -1,5 +1,5 @@
 # Lyrics Syncer Studio
-A basic **Vibe-coded** lyric synchronizing tool that works for some players like [Metrolist](https://github.com/MetrolistGroup/Metrolist) and [ViVi Music](https://github.com/vivizzz007/vivi-music).
+A basic **Vibe-coded** lyric synchronizing web-tool that works for some players like [Metrolist](https://github.com/MetrolistGroup/Metrolist) and [ViVi Music](https://github.com/vivizzz007/vivi-music).
 
 # About This Tool
 What it does is to synchronize lyrics to the track currently playing
