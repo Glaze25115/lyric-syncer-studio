@@ -10,7 +10,7 @@ Functions and shortcuts
 - Basics
   - Next Line - `Space`
   - Undo - `Backspace`
-  - Add existing `.txt` or `.lrc`
+  - Paste or Add existing `.txt` or `.lrc`
   - Adding required audio files, any audio files like `.mp3`, `.m4a`, `.flac`, etc
   - Save as `.lrc`, need compiling and exporting result first then save with the track's filename like `songFilename.mp3`.
 - Advanced
