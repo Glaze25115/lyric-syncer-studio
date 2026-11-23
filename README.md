@@ -6,6 +6,8 @@ What it does is to synchronize lyrics to the track currently playing
 
 **Example**: Tapping space adds a timestamps to a line or word, depending on the synchronizing mode.
 
+[Skip over to visit ↡](#go-see-site)
+
 Functions and shortcuts
 - Basics
   - Next Line - `Spacebar`
