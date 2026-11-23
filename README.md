@@ -52,7 +52,7 @@ Functions and shortcuts
 -----
 <div align="center">
 <h1>Go see site</h1>
-
-[Visit Site](https://glaze25115.github.io/lyric-syncer-studio/)
+  
+<h1 align="center"><a href="https://glaze25115.github.io/lyric-syncer-studio/">Visit Site</a></h1>
 
 Vibe-coded using Gemini AI
