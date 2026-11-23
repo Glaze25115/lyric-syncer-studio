@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViVi Music Advanced Syncer Studio</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #18181c;
+            color: #e0e0e0;
+            padding: 16px 12px 380px 12px; 
+            margin: 0 auto;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 { 
+            font-size: clamp(20px, 4vw, 26px); 
+            color: #ffffff; 
+            margin-top: 10px;
+            margin-bottom: 6px; 
+            text-align: center; 
+        }
+
+        .subtitle { 
+            color: #888; 
+            margin-bottom: 20px; 
+            font-size: clamp(12px, 3.2vw, 14px); 
+            text-align: center; 
+        }
+        
+        .full-width-panel {
+            width: 100%;
+            background-color: #111113;
+            border: 1px solid #28282c;
+            border-radius: 18px;
+            padding: clamp(12px, 3vw, 20px);
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .tips-panel {
+            background-color: #1c1912;
+            border: 1px solid #c97d10;
+            border-radius: 14px;
+            padding: clamp(12px, 3vw, 16px);
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .tips-panel summary {
+            cursor: pointer;
+            outline: none;
+            user-select: none;
+            list-style: none;
+        }
+
+        .tips-panel summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .tips-title {
+            color: #ff9500;
+            font-size: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tips-title::after {
+            content: "▼";
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .tips-panel[open] .tips-title::after {
+            transform: rotate(180deg);
+        }
+
+        .tips-list {
+            font-size: clamp(12px, 3.2vw, 14px);
+            color: #d1c7bd;
+            margin: 12px 0 0 0;
+            padding-left: 18px;
+            line-height: 1.5;
+        }
+
+        .tips-list li { margin-bottom: 6px; }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            background-color: #09090b;
+            color: #fff;
+            border: 1px solid #242427;
+            border-radius: 14px;
+            padding: 14px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 15px;
+            resize: vertical;
+            outline: none;
+        }
+
+        textarea:focus { border-color: #ff9500; }
+
+        .settings-bar {
+            background: #1e1e22;
+            border: 1px solid #2d2d33;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin: 10px 0 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .setting-row-title { 
+            font-size: 15px; 
+            font-weight: 500; 
+            color: #aaa; 
+        }
+        
+        .toggle-box {
+            display: flex;
+            background: #09090b;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid #2d2d33;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            color: #aaa;
+            border: none;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .toggle-btn.active { background-color: #ff9500; color: #000; }
+
+        .sync-stack-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background-color: #242427;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #242427;
+            margin-bottom: 20px;
+        }
+
+        .sync-line {
+            padding: 16px 12px;
+            background-color: #1e1e22;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sync-line.active { background-color: #27272e; box-shadow: inset 5px 0 0 #ff9500; }
+        .sync-line.synced { background-color: #191c1a; }
+
+        .sync-line-text { 
+            font-size: clamp(15px, 3.8vw, 19px); 
+            font-weight: bold; 
+            color: #fff; 
+            flex: 1 1 200px;
+            min-width: 0;
+            word-break: break-word;
+        }
+
+        .sync-line.synced .sync-line-text { color: #a3e2ab; opacity: 0.8; }
+
+        .agent-inline-badge {
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .badge-off { background: #4a4a52; color: #aaa; }
+        .badge-v1 { background: #007aff; color: #fff; }
+        .badge-v2 { background: #5856d6; color: #fff; }
+        .badge-v3 { background: linear-gradient(135deg, #d4af37, #c0392b); color: #fff; }
+        .badge-bg { background: #ff2d55; color: #fff; }
+        .badge-v1000 { background: #af52de; color: #fff; }
+
+        .words-container { display: inline-flex; flex-wrap: wrap; row-gap: 8px; gap: 4px; }
+        .word-wrapper { display: inline-flex; align-items: center; }
+
+        .word-bubble {
+            display: inline-flex !important;
+            align-items: center !important;
+            line-height: normal;
+            height: auto;
+            padding: 4px 10px !important;
+            background-color: #2d2d33;
+            border: 1px solid #3a3a42;
+            font-size: clamp(14px, 3.5vw, 17px);
+            border-radius: 8px !important;
+            transition: all 0.1s ease;
+            white-space: pre-wrap;
+            overflow: visible !important;
+        }
+
+        .word-bubble.upcoming-cursor { border: 1px dashed #ff9500 !important; background-color: transparent; color: #ff9500; }
+        .word-bubble.current-word { background-color: #ff9500; color: #000; font-weight: bold; border-color: #fff !important; }
+        .word-bubble.stamped { background-color: #223a28; color: #a3e2ab; border-color: #34c759; }
+        .word-bubble.cutoff-marked { border-right: 5px solid #ff2d55 !important; }
+
+        /* Stack original token above romanized sub-label inside a pill without changing export text */
+        .word-bubble.has-roman {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 2px;
+            padding: 4px 10px !important;
+        }
+
+        .pill-roman-sub {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 1.1;
+            color: #ffb84d;
+            opacity: 0.92;
+            letter-spacing: 0.2px;
+        }
+
+        .word-bubble.current-word .pill-roman-sub {
+            color: #111113;
+            opacity: 1;
+        }
+
+        .word-bubble.stamped .pill-roman-sub {
+            color: #7ee08c;
+        }
+
+        .line-roman-sub {
+            display: block;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 600;
+            color: #ffb84d;
+            opacity: 0.9;
+            margin-top: 4px;
+            word-break: break-word;
+        }
+
+        .time-badge {
+            font-family: monospace;
+            color: #ff9500;
+            font-size: 13px;
+            background: #332200;
+            padding: 4px 8px;
+            border-radius: 8px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .mobile-floating-dock {
+            position: fixed;
+            bottom: 95px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 24px);
+            max-width: 540px;
+            z-index: 1005;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none; 
+        }
+        
+        .floating-row {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            pointer-events: auto; 
+        }
+
+        .dock-agent-deck {
+            display: flex;
+            background: rgba(9, 9, 11, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 4px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .dock-agent-btn {
+            flex: 1;
+            background: transparent;
+            color: #aaa;
+            border: none;
+            padding: 10px 0;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .dock-agent-btn:focus { outline: none; }
+        .dock-agent-btn.active.off { background-color: #4a4a52; color: #fff; }
+        .dock-agent-btn.active.v1 { background-color: #007aff; color: #fff; }
+        .dock-agent-btn.active.v2 { background-color: #5856d6; color: #fff; }
+        .dock-agent-btn.active.v3 { background: linear-gradient(135deg, #d4af37, #c0392b); color: #fff; }
+        .dock-agent-btn.active.bg { background-color: #ff2d55; color: #fff; }
+        .dock-agent-btn.active.v1000 { background-color: #af52de; color: #fff; }
+
+        .floating-action-container {
+            display: flex;
+            width: 100%;
+            gap: 8px;
+        }
+        
+        .floating-btn {
+            font-size: clamp(14px, 3.5vw, 18px);
+            font-weight: bold;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            touch-action: manipulation;
+            transition: transform 0.05s ease;
+            padding: 14px 0;
+        }
+
+        .floating-btn:active { transform: scale(0.96); }
+
+        .btn-undo-float { background-color: #1c2a3a; color: #5ac8fa; border: 1px solid rgba(90, 200, 250, 0.3); flex: 1; }
+        .btn-break-float { background-color: #3d1c1c; color: #ff453a; border: 1px solid rgba(255, 69, 58, 0.3); flex: 1; display: none; }
+        .btn-next-float { background-color: #ff9500; color: #000; flex: 2; }
+
+        .sticky-control-dock {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #111113;
+            border-top: 1px solid #2d2d33;
+            box-shadow: 0 -12px 36px rgba(0,0,0,0.9);
+            padding: 10px 12px;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+        }
+
+        .dock-row {
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .file-btn-wrapper { 
+            position: relative; 
+            overflow: hidden; 
+            display: inline-block; 
+            flex-shrink: 0;
+        }
+
+        .file-btn-wrapper input[type=file] {
+            font-size: 100px; 
+            position: absolute; 
+            left: 0; 
+            top: 0; 
+            opacity: 0; 
+            cursor: pointer;
+        }
+
+        /* Custom Audio Player Container */
+        .custom-player-container {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            flex: 1 1 260px;
+            background: #1a1a1e;
+            border: 1px solid #2d2d33;
+            padding: 6px 12px;
+            border-radius: 10px;
+            min-width: 200px;
+        }
+
+        .btn-play-pause {
+            background: #ff9500;
+            color: #000;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .seekbar-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .seekbar {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #2d2d33;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .seekbar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ff9500;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .seekbar::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .seekbar::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ff9500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .time-display-ms {
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff9500;
+            font-weight: bold;
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        audio { display: none; }
+
+        .btn-close-media {
+            display: none;
+            background-color: #242427;
+            color: #ff453a;
+            border: 1px solid #3d1c1c;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-close-media:hover { background-color: #3d1c1c; }
+
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .offset-container, .speed-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background-color: #1e1e22;
+            border: 1px solid #3a3a42;
+            padding: 4px 8px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .offset-label, .speed-label {
+            font-size: 10px; 
+            font-weight: bold; 
+            color: #aaa; 
+            text-transform: uppercase; 
+            white-space: nowrap;
+        }
+
+        .offset-input, .speed-select {
+            background-color: #09090b;
+            border: 1px solid #4a4a55;
+            color: #ff9500;
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 4px;
+            border-radius: 6px;
+            outline: none;
+            text-align: center;
+        }
+
+        .offset-input { width: 48px; }
+
+        .speed-select {
+            cursor: pointer; 
+            appearance: none; 
+            -webkit-appearance: none; 
+            padding-right: 18px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23ff9500' stroke-width='2'><path d='M1 1l4 4 4-4'/></svg>");
+            background-repeat: no-repeat; 
+            background-position: right 4px center;
+        }
+
+        button.ui-action {
+            background-color: #ff9500; 
+            color: black; 
+            border: none; 
+            padding: 10px 16px;
+            font-size: 14px; 
+            font-weight: bold; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        button.ui-action.secondary { background-color: #242427; color: #fff; border: 1px solid #3a3a42; }
+        
+        .mode-header-box { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+
+        .mode-select-tab {
+            background: #1e1e22; color: #888; border: 1px solid #2d2d33; padding: 10px 16px; font-size: 14px; border-radius: 10px; cursor: pointer; flex: 1;
+        }
+
+        .mode-select-tab.active { background: #ff9500; color: #000; border-color: #ff9500; font-weight: bold; }
+        label { font-size: 15px; }
+
+        @media (max-width: 600px) {
+            body {
+                padding-bottom: 350px;
+            }
+            .settings-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toggle-box {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .setting-row-title {
+                text-align: center;
+            }
+            .dock-row {
+                gap: 6px;
+            }
+            .controls-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>ViVi Music Lyric Syncer Studio 🎧</h2>
+    <div class="subtitle">Multi-agent compilation engine styled with vertically scannable continuous streams.</div>
+
+    <details class="tips-panel">
+        <summary class="tips-title">💡 Production Tips & Shortcuts</summary>
+        <ul class="tips-list">
+            <li><strong>Word Grouping:</strong> Wrap multiple words in chevrons like <code>&lt;gonna be&gt;</code> to stamp them together as one unit.</li>
+            <li><strong>Syllable Splitting:</strong> Use <code>|</code> directly inside raw words (e.g., <code>to|ge|ther</code>) to split them into seamless separate stampable targets.</li>
+            <li><strong>Mix Mode (Word + Char):</strong> In Word-by-Word mode, <strong>Mix</strong> keeps Latin words (including <code>'</code> and <code>-</code>) together and respects <code>|</code> and <code>&lt;...&gt;</code>, while splitting non-Latin/CJK/Cyrillic and em/en-dashes individually without adding extra spaces.</li>
+            <li><strong>Romanize Toggle:</strong> Toggle <strong>Romanize</strong> independently to show offline romanization under pills and lines in Line-by-Line, Word-by-Word, Char-by-Char, and Mix modes.</li>
+            <li><strong>Instant Sentence Jump:</strong> On the final word of a line, pressing <strong>Next Word</strong> ends that word, hops lines, and starts the next line instantly!</li>
+            <li><strong>Hot Audio Audition:</strong> Click any already-synced row to instantly jump the audio player back to that line's exact start timestamp.</li>
+        </ul>
+    </details>
+
+    <div class="full-width-panel">
+        <div class="mode-header-box">
+            <button class="mode-select-tab active">Syncing Target Engine Mode</button>
+        </div>
+        <textarea id="rawLyrics" placeholder="Paste clean raw text or pre-synced Pipestream LRC here..."></textarea>
+        <div style="margin-top: 14px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+            <div class="file-btn-wrapper">
+                <button class="ui-action secondary" tabindex="-1">📂 Load .txt / .lrc File</button>
+                <input type="file" id="lrcFileInput" accept=".txt,.lrc" onchange="loadLyricsFile(this)">
+            </div>
+            <button class="ui-action" id="loadBtn" onclick="prepareForSyncingMode(event)">Load Into Syncer Rows ➡️</button>
+        </div>
+    </div>
+
+    <div class="settings-bar">
+        <span class="setting-row-title">Sync System Layout Target</span>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; width: 100%; max-width: 860px;">
+            <div class="toggle-box" style="flex: 1;">
+                <span style="font-size: 11px; font-weight: bold; color: #666; padding: 0 6px; text-transform: uppercase;">Export:</span>
+                <button id="exportPipestream" class="toggle-btn" onclick="setExportFormat('pipestream', event)">Pipestream LRC</button>
+                <button id="exportNormalLRC" class="toggle-btn active" onclick="setExportFormat('normallrc', event)">Normal .LRC</button>
+            </div>
+            <div class="toggle-box" style="flex: 1;">
+                <button id="modeLine" class="toggle-btn active" onclick="switchSyncType('line', event)">Line-by-Line</button>
+                <button id="modeWord" class="toggle-btn" onclick="switchSyncType('word', event)">Word-by-Word</button>
+            </div>
+            <div class="toggle-box" id="charModeBox" style="display: none; flex: 0 0 auto; gap: 4px;">
+                <button id="forceCharToggle" class="toggle-btn" onclick="setWordSplitMode('char', event)" title="Split all words into individual characters without adding spaces">Char-by-Char</button>
+                <button id="mixSplitToggle" class="toggle-btn" onclick="setWordSplitMode('mix', event)" title="Keep Latin words (with ' and -), | splits, and <...> groups intact while splitting non-Latin/CJK/Cyrillic and em/en-dashes">Mix</button>
+            </div>
+            <div class="toggle-box" style="flex: 0 0 auto;">
+                <button id="romanizeToggle" class="toggle-btn" onclick="toggleRomanization(event)" title="Show offline romanization under pills and lines across all sync modes">Romanize: OFF</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sync-stack-container" id="syncWindow">
+        <div style="color: #666; text-align: center; padding: 60px 0; background-color: #1e1e22; font-size:16px;">
+            Load lyrics up top to view targets here...
+        </div>
+    </div>
+
+    <div class="full-width-panel" style="margin-top: 10px;">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+            <label style="font-weight: bold;">2. Final Synchronized Output:</label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="ui-action secondary" id="copyBtn" onclick="copyCompiledOutput(event)">📋 Copy Text</button>
+                <button class="ui-action secondary" onclick="downloadLRCFile(event)">💾 Save .lrc</button>
+                <button class="ui-action" onclick="processCompilation(event)">Compile & Export 🚀</button>
+            </div>
+        </div>
+        <textarea id="finalOutput" style="height: 180px;" readonly placeholder="Your compiled layout file will load here..."></textarea>
+    </div>
+
+    <div class="mobile-floating-dock">
+        <div class="floating-row">
+            <div class="dock-agent-deck" id="agentDeck">
+                <button class="dock-agent-btn active off" id="agentBtn-off" onclick="setGlobalAgent('off', event)">off</button>
+                <button class="dock-agent-btn v1" id="agentBtn-v1" onclick="setGlobalAgent('v1', event)">v1</button>
+                <button class="dock-agent-btn" id="agentBtn-v2" onclick="setGlobalAgent('v2', event)">v2</button>
+                <button class="dock-agent-btn" id="agentBtn-v3" onclick="setGlobalAgent('v3', event)">v3</button>
+                <button class="dock-agent-btn" id="agentBtn-bg" onclick="setGlobalAgent('bg', event)">bg</button>
+                <button class="dock-agent-btn" id="agentBtn-v1000" onclick="setGlobalAgent('v1000', event)">v1000</button>
+            </div>
+        </div>
+        
+        <div class="floating-row">
+            <div class="floating-action-container">
+                <button id="breakButton" class="floating-btn btn-break-float" onclick="triggerWordBreak(event)">Word End</button>
+                <button class="floating-btn btn-undo-float" onclick="undoCurrentLine(event)">Undo</button>
+                <button id="nextActionBtn" class="floating-btn btn-next-float" onclick="stampEngineClick(event)">Next Line</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sticky-control-dock">
+        <div class="dock-row">
+            <div class="file-btn-wrapper" id="fileWrapper">
+                <button class="ui-action secondary" style="padding: 8px 10px; font-size:12px;" tabindex="-1">Choose File</button>
+                <input type="file" id="audioFile" accept="audio/*" onchange="loadAudio(this)">
+            </div>
+
+            <!-- Custom Modern Audio Control Strip -->
+            <div id="customPlayer" class="custom-player-container">
+                <button id="playPauseBtn" class="btn-play-pause" onclick="togglePlayPause(event)">▶</button>
+                <div class="seekbar-container">
+                    <input type="range" id="seekBar" class="seekbar" value="0" min="0" max="100" step="0.001" oninput="onSeekInput(this)" onchange="onSeekChange(this)">
+                </div>
+                <div id="timeDisplay" class="time-display-ms">00:00.000</div>
+            </div>
+
+            <audio id="audioPlayer"></audio>
+            <button id="closeMediaBtn" class="btn-close-media" onclick="closeAudio(event)">✕</button>
+            
+            <div class="controls-group">
+                <div class="speed-container">
+                    <span class="speed-label">Speed</span>
+                    <select id="playbackSpeed" class="speed-select" onchange="changePlaybackSpeed(this)">
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1.0" selected>1.0x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2.0">2.0x</option>
+                    </select>
+                </div>
+
+                <div class="offset-container">
+                    <span class="offset-label">Offset</span>
+                    <input type="number" id="bluetoothOffset" class="offset-input" value="0" step="10" placeholder="0">
+                </div>
+
+                <button class="ui-action secondary" style="padding: 8px 10px; font-size:12px;" onclick="resetSync(event)">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lyricRows = [];
+        let currentLineIndex = 0;
+        let currentWordIndex = 0; 
+        let syncType = 'line'; 
+        let exportFormat = 'normallrc';
+        let wordSplitMode = 'off'; // 'off' | 'char' | 'mix'
+        let romanizeEnabled = false; // Standalone toggle across line-by-line, word-by-word, char-by-char, and mix
+        let selectedAgent = 'off'; // Default vocal mode changed to 'off'
+        let isSeeking = false;
+        let currentAudioFilename = ''; 
+        
+        const player = document.getElementById('audioPlayer');
+        const customPlayer = document.getElementById('customPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const seekBar = document.getElementById('seekBar');
+        const timeDisplay = document.getElementById('timeDisplay');
+
+        // Offline Kana (yoon pairs, single kana, small tsu, long vowel mark), Hangul, and Cyrillic lookup tables
+        const KANA_YOON_MAP = {
+            'きゃ':'kya','きゅ':'kyu','きょ':'kyo','キャ':'kya','キュ':'kyu','キョ':'kyo',
+            'しゃ':'sha','しゅ':'shu','しょ':'sho','シャ':'sha','シュ':'shu','ショ':'sho',
+            'ちゃ':'cha','ちゅ':'chu','ちょ':'cho','チャ':'cha','チュ':'chu','チョ':'cho',
+            'にゃ':'nya','にゅ':'nyu','にょ':'nyo','ニャ':'nya','ニュ':'nyu','ニョ':'nyo',
+            'ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','ヒャ':'hya','ヒュ':'hyu','ヒョ':'hyo',
+            'みゃ':'mya','みゅ':'myu','みょ':'myo','ミャ':'mya','ミュ':'myu','ミョ':'myo',
+            'りゃ':'rya','りゅ':'ryu','りょ':'ryo','リャ':'rya','リュ':'ryu','リョ':'ryo',
+            'ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo','ギャ':'gya','ギュ':'gyu','ギョ':'gyo',
+            'じゃ':'ja','じゅ':'ju','じょ':'jo','ジャ':'ja','ジュ':'ju','ジョ':'jo',
+            'びゃ':'bya','びゅ':'byu','びょ':'byo','ビャ':'bya','ビュ':'byu','ビョ':'byo',
+            'ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo','ピャ':'pya','ピュ':'pyu','ピョ':'pyo',
+            'ふぁ':'fa','ふぃ':'fi','ふぇ':'fe','ふぉ':'fo','ファ':'fa','フィ':'fi','フェ':'fe','フォ':'fo',
+            'てぃ':'ti','でぃ':'di','とぅ':'tu','どぅ':'du','ティ':'ti','ディ':'di','トゥ':'tu','ドゥ':'du',
+            'うぃ':'wi','うぇ':'we','うぉ':'wo','ウィ':'wi','ウェ':'we','ウォ':'wo',
+            'ゔぁ':'va','ゔぃ':'vi','ゔ':'vu','ゔぇ':'ve','ゔぉ':'vo',
+            'ヴァ':'va','ヴィ':'vi','ヴ':'vu','ヴェ':'ve','ヴォ':'vo'
+        };
+
+        const KANA_SINGLE_MAP = {
+            'あ':'a','い':'i','う':'u','え':'e','お':'o',
+            'ア':'a','イ':'i','ウ':'u','エ':'e','オ':'o',
+            'ん':'n','ン':'n',
+            'か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko',
+            'カ':'ka','キ':'ki','ク':'ku','ケ':'ke','コ':'ko',
+            'が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go',
+            'ガ':'ga','ギ':'gi','グ':'gu','ゲ':'ge','ゴ':'go',
+            'さ':'sa','し':'shi','す':'su','せ':'se','そ':'so',
+            'サ':'sa','シ':'shi','ス':'su','セ':'se','ソ':'so',
+            'ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo',
+            'ザ':'za','ジ':'ji','ズ':'zu','ゼ':'ze','ゾ':'zo',
+            'た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to',
+            'タ':'ta','チ':'chi','ツ':'tsu','テ':'te','ト':'to',
+            'だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do',
+            'ダ':'da','ヂ':'ji','ヅ':'zu','デ':'de','ド':'do',
+            'な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no',
+            'ナ':'na','ニ':'ni','ヌ':'nu','ネ':'ne','ノ':'no',
+            'は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho',
+            'ハ':'ha','ヒ':'hi','フ':'fu','ヘ':'he','ホ':'ho',
+            'ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo',
+            'バ':'ba','ビ':'bi','ブ':'bu','ベ':'be','ボ':'bo',
+            'ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po',
+            'パ':'pa','ピ':'pi','プ':'pu','ペ':'pe','ポ':'po',
+            'ま':'ma','み':'mi','む':'mu','め':'me','も':'mo',
+            'マ':'ma','ミ':'mi','ム':'mu','メ':'me','モ':'mo',
+            'や':'ya','ゆ':'yu','よ':'yo',
+            'ヤ':'ya','ユ':'yu','ヨ':'yo',
+            'ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro',
+            'ラ':'ra','リ':'ri','ル':'ru','レ':'re','ロ':'ro',
+            'わ':'wa','ゐ':'wi','ゑ':'we','を':'o',
+            'ワ':'wa','ヰ':'wi','ヱ':'we','ヲ':'o',
+            'ヴ':'vu'
+        };
+
+        const CYRILLIC_MAP = {
+            'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z','и':'i','й':'y',
+            'к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f',
+            'х':'kh','ц':'ts','ч':'ch','ш':'sh','щ':'shch','ъ':'','ы':'y','ь':"'",'э':'e','ю':'yu','я':'ya',
+            'А':'A','Б':'B','В':'V','Г':'G','Д':'D','Е':'E','Ё':'Yo','Ж':'Zh','З':'Z','И':'I','Й':'Y',
+            'К':'K','Л':'L','М':'M','Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U','Ф':'F',
+            'Х':'Kh','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Shch','Ъ':'','Ы':'Y','Ь':"'",'Э':'E','Ю':'Yu','Я':'Ya'
+        };
+
+        const HANGUL_CHOSEONG = ['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h'];
+        const HANGUL_JUNGSEONG = ['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i'];
+        const HANGUL_JONGSEONG = ['','k','kk','ks','n','nj','nh','d','l','lg','lm','lb','ls','lt','lp','lh','m','p','ps','s','ss','ng','j','ch','k','t','p','h'];
+
+        function romanizeHangulChar(ch) {
+            const code = ch.charCodeAt(0);
+            if (code >= 0xAC00 && code <= 0xD7A3) {
+                const idx = code - 0xAC00;
+                const c = Math.floor(idx / (21 * 28));
+                const j = Math.floor((idx % (21 * 28)) / 28);
+                const t = idx % 28;
+                return HANGUL_CHOSEONG[c] + HANGUL_JUNGSEONG[j] + HANGUL_JONGSEONG[t];
+            }
+            return null;
+        }
+
+        function isNonAlphabeticalChar(ch) {
+            const code = ch.charCodeAt(0);
+            if (/[A-Za-z0-9\s\p{P}]/u.test(ch)) return false;
+            return (
+                (code >= 0x0400 && code <= 0x052F) || // Cyrillic
+                (code >= 0x2E80 && code <= 0x30FF) || // CJK radicals, symbols, Hiragana, Katakana
+                (code >= 0x31F0 && code <= 0x31FF) || // Katakana phonetic extensions
+                (code >= 0x3400 && code <= 0x9FFF) || // CJK Unified Ideographs
+                (code >= 0xAC00 && code <= 0xD7AF) || // Hangul syllables & Jamo
+                (code >= 0xF900 && code <= 0xFAFF) || // CJK Compatibility Ideographs
+                (code >= 0xFF00 && code <= 0xFFEF)    // Halfwidth/Fullwidth forms
+            );
+        }
+
+        function romanizeTextOffline(inputText) {
+            if (!inputText) return "";
+            const chars = Array.from(inputText);
+            let hasTargetScript = false;
+            let out = "";
+            let geminateNext = false;
+            let lastVowel = "";
+
+            for (let i = 0; i < chars.length; i++) {
+                const ch = chars[i];
+                const nextCh = (i + 1 < chars.length) ? chars[i + 1] : "";
+                const pair = ch + nextCh;
+
+                // Small tsu doubles the initial consonant of the following kana syllable
+                if (ch === 'っ' || ch === 'ッ') {
+                    hasTargetScript = true;
+                    geminateNext = true;
+                    continue;
+                }
+
+                // Long vowel mark repeats the preceding vowel sound
+                if (ch === 'ー') {
+                    hasTargetScript = true;
+                    if (lastVowel) out += lastVowel;
+                    continue;
+                }
+
+                // Combined yoon kana pairs (e.g., しゃ, きょ, ファ)
+                if (Object.prototype.hasOwnProperty.call(KANA_YOON_MAP, pair)) {
+                    hasTargetScript = true;
+                    let syl = KANA_YOON_MAP[pair];
+                    if (geminateNext && syl.length > 0) {
+                        syl = syl[0] + syl;
+                        geminateNext = false;
+                    }
+                    out += syl;
+                    lastVowel = syl.slice(-1);
+                    i++;
+                    continue;
+                }
+
+                // Single kana syllable or n
+                if (Object.prototype.hasOwnProperty.call(KANA_SINGLE_MAP, ch)) {
+                    hasTargetScript = true;
+                    let syl = KANA_SINGLE_MAP[ch];
+                    if (geminateNext && syl.length > 0 && ch !== 'ん' && ch !== 'ン') {
+                        syl = syl[0] + syl;
+                        geminateNext = false;
+                    }
+                    out += syl;
+                    if (ch !== 'ん' && ch !== 'ン') {
+                        lastVowel = syl.slice(-1);
+                    }
+                    continue;
+                }
+
+                // Hangul syllable block
+                const hangulSyl = romanizeHangulChar(ch);
+                if (hangulSyl !== null) {
+                    hasTargetScript = true;
+                    out += hangulSyl;
+                    continue;
+                }
+
+                // Cyrillic character
+                if (Object.prototype.hasOwnProperty.call(CYRILLIC_MAP, ch)) {
+                    hasTargetScript = true;
+                    out += CYRILLIC_MAP[ch];
+                    continue;
+                }
+
+                // CJK / non-alphabetical character without an offline dictionary
+                if (isNonAlphabeticalChar(ch)) {
+                    hasTargetScript = true;
+                    out += "·";
+                    continue;
+                }
+
+                // Preserve Latin text, spaces, and punctuation
+                out += ch;
+                if (/[aeiou]/i.test(ch)) {
+                    lastVowel = ch.slice(-1).toLowerCase();
+                }
+            }
+
+            return hasTargetScript ? out.replace(/\s+/g, ' ').trim() : "";
+        }
+
+        function toggleRomanization(event) {
+            if (event) { event.preventDefault(); event.target.blur(); }
+            romanizeEnabled = !romanizeEnabled;
+            const btn = document.getElementById('romanizeToggle');
+            btn.className = `toggle-btn ${romanizeEnabled ? 'active' : ''}`;
+            btn.innerText = romanizeEnabled ? "Romanize: ON" : "Romanize: OFF";
+            renderSyncLines();
+        }
+
+        function isLatinWordPart(ch) {
+            return /[A-Za-z\u00C0-\u024F\u1E00-\u1EFF'\u2019\-]/.test(ch);
+        }
+
+        function splitSingleUnitByMode(textStr, trailingSpace, initialStart = null, isGroup = false) {
+            if (wordSplitMode === 'char') {
+                let rawChars = Array.from(textStr.replace(/\|/g, ''));
+                let charTokens = [];
+                for (let cIdx = 0; cIdx < rawChars.length; cIdx++) {
+                    let ch = rawChars[cIdx];
+                    if (/\s/.test(ch)) {
+                        if (charTokens.length > 0) {
+                            charTokens[charTokens.length - 1].trailingSpace = true;
+                        }
+                    } else {
+                        charTokens.push({
+                            text: ch,
+                            start: (charTokens.length === 0) ? initialStart : null,
+                            end: null,
+                            cutoffExplicit: false,
+                            trailingSpace: false
+                        });
+                    }
+                }
+                if (charTokens.length > 0) {
+                    charTokens[charTokens.length - 1].trailingSpace = trailingSpace;
+                }
+                return charTokens;
+            }
+
+            if (wordSplitMode === 'mix') {
+                if (isGroup) {
+                    return [{
+                        text: textStr.replace(/\|/g, ''),
+                        start: initialStart,
+                        end: null,
+                        cutoffExplicit: false,
+                        trailingSpace: trailingSpace
+                    }];
+                }
+
+                let pipeParts = textStr.split('|');
+                let allTokens = [];
+                let assignedInitial = false;
+
+                for (let pIdx = 0; pIdx < pipeParts.length; pIdx++) {
+                    let part = pipeParts[pIdx];
+                    let hasMorePipes = pIdx < pipeParts.length - 1;
+                    let chars = Array.from(part);
+                    let segments = [];
+                    let latinBuf = "";
+
+                    for (let idx = 0; idx < chars.length; idx++) {
+                        let ch = chars[idx];
+                        if (/\s/.test(ch)) {
+                            if (latinBuf.length > 0) {
+                                segments.push({ text: latinBuf, trailingSpace: false });
+                                latinBuf = "";
+                            }
+                            if (segments.length > 0) {
+                                segments[segments.length - 1].trailingSpace = true;
+                            }
+                            continue;
+                        }
+
+                        if (isLatinWordPart(ch)) {
+                            latinBuf += ch;
+                        } else {
+                            if (latinBuf.length > 0) {
+                                segments.push({ text: latinBuf, trailingSpace: false });
+                                latinBuf = "";
+                            }
+                            segments.push({ text: ch, trailingSpace: false });
+                        }
+                    }
+
+                    if (latinBuf.length > 0) {
+                        segments.push({ text: latinBuf, trailingSpace: false });
+                    }
+
+                    for (let sIdx = 0; sIdx < segments.length; sIdx++) {
+                        let seg = segments[sIdx];
+                        let isLastSegInPart = (sIdx === segments.length - 1);
+                        let tokenTrailingSpace = isLastSegInPart
+                            ? (hasMorePipes ? false : trailingSpace)
+                            : seg.trailingSpace;
+
+                        allTokens.push({
+                            text: seg.text,
+                            start: (!assignedInitial) ? initialStart : null,
+                            end: null,
+                            cutoffExplicit: false,
+                            trailingSpace: tokenTrailingSpace
+                        });
+                        assignedInitial = true;
+                    }
+                }
+
+                return allTokens;
+            }
+
+            return null;
+        }
+
+        function loadLyricsFile(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('rawLyrics').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+            input.value = ""; 
+        }
+
+        function formatDisplayTimeMS(seconds) {
+            if (seconds === null || isNaN(seconds)) return "00:00.000";
+            const hrs = Math.floor(seconds / 3600);
+            const min = Math.floor((seconds % 3600) / 60);
+            const sec = Math.floor(seconds % 60);
+            const ms = Math.floor((seconds % 1) * 1000);
+
+            const secStr = String(sec).padStart(2, '0');
+            const msStr = String(ms).padStart(3, '0');
+
+            if (hrs > 0) {
+                const minStr = String(min).padStart(2, '0');
+                return `${hrs}:${minStr}:${secStr}.${msStr}`;
+            } else {
+                const minStr = String(min).padStart(2, '0');
+                return `${minStr}:${secStr}.${msStr}`;
+            }
+        }
+
+        function loadAudio(input) {
+            const file = input.files[0];
+            if (file) {
+                const fullName = file.name;
+                const lastDot = fullName.lastIndexOf('.');
+                currentAudioFilename = lastDot !== -1 ? fullName.substring(0, lastDot) : fullName;
+
+                player.src = URL.createObjectURL(file);
+                customPlayer.style.display = "flex"; 
+                document.getElementById('fileWrapper').style.display = "none";
+                document.getElementById('closeMediaBtn').style.display = "block";
+                const speedSel = document.getElementById('playbackSpeed');
+                player.playbackRate = parseFloat(speedSel.value);
+            }
+            input.blur();
+        }
+
+        function closeAudio(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            player.pause();
+            player.src = "";
+            currentAudioFilename = '';
+            customPlayer.style.display = "none";
+            document.getElementById('audioFile').value = "";
+            document.getElementById('closeMediaBtn').style.display = "none";
+            document.getElementById('fileWrapper').style.display = "inline-block";
+            playPauseBtn.innerText = "▶";
+            seekBar.value = 0;
+            timeDisplay.innerText = "00:00.000";
+        }
+
+        function togglePlayPause(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            if (!player.src) return;
+            if (player.paused) {
+                player.play().catch(() => {});
+            } else {
+                player.pause();
+            }
+        }
+
+        player.addEventListener('play', () => { playPauseBtn.innerText = "❚❚"; });
+        player.addEventListener('pause', () => { playPauseBtn.innerText = "▶"; });
+
+        player.addEventListener('timeupdate', () => {
+            if (!isSeeking && player.duration) {
+                seekBar.value = (player.currentTime / player.duration) * 100;
+                timeDisplay.innerText = formatDisplayTimeMS(player.currentTime);
+            }
+        });
+
+        function onSeekInput(slider) {
+            isSeeking = true;
+            if (player.duration) {
+                const targetTime = (parseFloat(slider.value) / 100) * player.duration;
+                timeDisplay.innerText = formatDisplayTimeMS(targetTime);
+            }
+        }
+
+        function onSeekChange(slider) {
+            if (player.duration) {
+                player.currentTime = (parseFloat(slider.value) / 100) * player.duration;
+            }
+            isSeeking = false;
+            slider.blur();
+        }
+
+        function changePlaybackSpeed(select) {
+            const rate = parseFloat(select.value);
+            player.playbackRate = rate;
+            select.blur();
+        }
+
+        function handleRowClick(index) {
+            const clickedRow = lyricRows[index];
+
+            if (clickedRow && clickedRow.lineTimestamp !== null) {
+                player.currentTime = clickedRow.lineTimestamp;
+                if (player.paused && player.src) {
+                    player.play().catch(() => {});
+                }
+            }
+
+            currentLineIndex = index;
+            if (syncType === 'word') {
+                let lastStampedIdx = -1;
+                clickedRow.flatTokens.forEach((t, i) => {
+                    if (t.start !== null) lastStampedIdx = i;
+                });
+                currentWordIndex = lastStampedIdx + 1;
+            } else {
+                currentWordIndex = 0;
+            }
+            
+            selectedAgent = lyricRows[index].assignedAgent;
+            updateAgentButtonsUI(selectedAgent);
+            renderSyncLines();
+        }
+
+        function setExportFormat(format, event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            exportFormat = format;
+            document.getElementById('exportPipestream').className = `toggle-btn ${format === 'pipestream' ? 'active' : ''}`;
+            document.getElementById('exportNormalLRC').className = `toggle-btn ${format === 'normallrc' ? 'active' : ''}`;
+        }
+
+        function updateSplitModeUI() {
+            const charBtn = document.getElementById('forceCharToggle');
+            const mixBtn = document.getElementById('mixSplitToggle');
+            charBtn.className = `toggle-btn ${wordSplitMode === 'char' ? 'active' : ''}`;
+            mixBtn.className = `toggle-btn ${wordSplitMode === 'mix' ? 'active' : ''}`;
+
+            if (syncType === 'word') {
+                document.getElementById('nextActionBtn').innerText = (wordSplitMode === 'char') ? "Next Char" : "Next Word";
+            }
+        }
+
+        function switchSyncType(type, event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            syncType = type;
+            document.getElementById('modeLine').className = `toggle-btn ${type === 'line' ? 'active' : ''}`;
+            document.getElementById('modeWord').className = `toggle-btn ${type === 'word' ? 'active' : ''}`;
+            
+            const breakBtn = document.getElementById('breakButton');
+            const nextBtn = document.getElementById('nextActionBtn');
+            const charModeBox = document.getElementById('charModeBox');
+            
+            if (type === 'line') {
+                breakBtn.style.display = "none";
+                charModeBox.style.display = "none";
+                nextBtn.innerText = "Next Line";
+            } else {
+                breakBtn.style.display = "block";
+                charModeBox.style.display = "flex";
+                updateSplitModeUI();
+            }
+            resetSync();
+        }
+
+        function setWordSplitMode(mode, event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            wordSplitMode = (wordSplitMode === mode) ? 'off' : mode;
+            updateSplitModeUI();
+
+            if (document.getElementById('rawLyrics').value.trim()) {
+                prepareForSyncingMode();
+            } else if (lyricRows.length > 0) {
+                lyricRows.forEach(row => {
+                    let rebuilt = [];
+                    row.flatTokens.forEach(t => {
+                        let splitResult = splitSingleUnitByMode(t.text, t.trailingSpace, null, false);
+                        if (splitResult && splitResult.length > 0) {
+                            rebuilt.push(...splitResult);
+                        } else {
+                            rebuilt.push({
+                                text: t.text,
+                                start: null,
+                                end: null,
+                                cutoffExplicit: false,
+                                trailingSpace: t.trailingSpace
+                            });
+                        }
+                    });
+                    row.flatTokens = rebuilt;
+                    row.lineTimestamp = null;
+                    row.endTimestamp = null;
+                });
+                currentLineIndex = 0;
+                currentWordIndex = 0;
+                renderSyncLines();
+            }
+        }
+
+        function updateAgentButtonsUI(agentKey) {
+            document.querySelectorAll('.dock-agent-btn').forEach(btn => {
+                btn.className = 'dock-agent-btn';
+            });
+            const targetBtn = document.getElementById(`agentBtn-${agentKey}`);
+            if (targetBtn) {
+                targetBtn.className = `dock-agent-btn active ${agentKey}`;
+            }
+        }
+
+        function getPreviousLeadLineTimestamp(rowIndex) {
+            for (let j = rowIndex - 1; j >= 0; j--) {
+                if (lyricRows[j].assignedAgent !== 'bg' && lyricRows[j].lineTimestamp !== null) {
+                    return lyricRows[j].lineTimestamp;
+                }
+            }
+            if (rowIndex > 0 && lyricRows[rowIndex - 1].lineTimestamp !== null) {
+                return lyricRows[rowIndex - 1].lineTimestamp;
+            }
+            return null;
+        }
+
+        function setGlobalAgent(agentKey, event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            selectedAgent = agentKey;
+            updateAgentButtonsUI(agentKey);
+            
+            if (lyricRows.length > 0) {
+                for (let i = currentLineIndex; i < lyricRows.length; i++) {
+                    if (lyricRows[i].lineTimestamp === null) {
+                        lyricRows[i].assignedAgent = agentKey;
+                    } else {
+                        if (i === currentLineIndex) {
+                            lyricRows[i].assignedAgent = agentKey;
+                            if (agentKey === 'bg') {
+                                const prevLeadTs = getPreviousLeadLineTimestamp(i);
+                                if (prevLeadTs !== null) {
+                                    lyricRows[i].lineTimestamp = prevLeadTs;
+                                }
+                            } else if (lyricRows[i].flatTokens.length > 0 && lyricRows[i].flatTokens[0].start !== null) {
+                                lyricRows[i].lineTimestamp = lyricRows[i].flatTokens[0].start;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                renderSyncLines();
+            }
+        }
+
+        function parseTimestamp(timeStr) {
+            const match = timeStr.match(/\[(\d+):(\d+)\.(\d+)\]/);
+            if (!match) return null;
+            const min = parseInt(match[1], 10);
+            const sec = parseInt(match[2], 10);
+            const ms = parseFloat("0." + match[3]);
+            return (min * 60) + sec + ms;
+        }
+
+        function getOffsetAppliedTime(seconds) {
+            if (seconds === null || isNaN(seconds)) return null;
+            const offsetMs = parseInt(document.getElementById('bluetoothOffset').value, 10) || 0;
+            const offsetSec = offsetMs / 1000;
+            return Math.max(0, seconds + offsetSec);
+        }
+
+        function formatTime(seconds) {
+            if (seconds === null || isNaN(seconds)) return "[00:00.00]";
+            const min = Math.floor(seconds / 60);
+            const sec = seconds % 60;
+            return `[${String(min).padStart(2, '0')}:${sec.toFixed(2).padStart(5, '0')}]`;
+        }
+
+        function formatInlineTime(seconds) {
+            if (seconds === null || isNaN(seconds)) return "<00:00.00>";
+            const min = Math.floor(seconds / 60);
+            const sec = seconds % 60;
+            return `<${String(min).padStart(2, '0')}:${sec.toFixed(2).padStart(5, '0')}>`;
+        }
+
+        function parseInlineTimestamp(tag) {
+            const match = tag.match(/<(\d+):(\d+)\.(\d+)>/);
+            if (!match) return null;
+            const min = parseInt(match[1], 10);
+            const sec = parseInt(match[2], 10);
+            const ms = parseFloat("0." + match[3]);
+            return (min * 60) + sec + ms;
+        }
+
+        function parseTextToTokens(textStr) {
+            let cleanStr = textStr.replace(/[{}]/g, '').trim();
+            
+            if (/\<\d+:\d+\.\d+\>/.test(cleanStr)) {
+                const tokenRegex = /(<\d+:\d+\.\d+>)|([^<]+)/g;
+                let match;
+                let tokens = [];
+                let currentTimestamp = null;
+
+                while ((match = tokenRegex.exec(cleanStr)) !== null) {
+                    let part = match[0];
+
+                    if (/^<\d+:\d+\.\d+>$/.test(part)) {
+                        let parsedTime = parseInlineTimestamp(part);
+                        if (parsedTime !== null) {
+                            currentTimestamp = parsedTime;
+                        }
+                        
+                        if (tokens.length > 0 && tokens[tokens.length - 1].start !== null && tokens[tokens.length - 1].end === null) {
+                            tokens[tokens.length - 1].end = parsedTime;
+                            tokens[tokens.length - 1].cutoffExplicit = true;
+                        }
+                    } else {
+                        let textChunk = part;
+                        let hasTrailingSpace = /\s$/.test(textChunk);
+                        let trimmedChunk = textChunk.trim();
+
+                        if (trimmedChunk.length > 0) {
+                            let splitTokens = splitSingleUnitByMode(trimmedChunk, hasTrailingSpace, currentTimestamp, false);
+                            if (splitTokens && splitTokens.length > 0) {
+                                tokens.push(...splitTokens);
+                            } else {
+                                tokens.push({
+                                    text: trimmedChunk,
+                                    start: currentTimestamp,
+                                    end: null,
+                                    cutoffExplicit: false,
+                                    trailingSpace: hasTrailingSpace
+                                });
+                            }
+                            currentTimestamp = null;
+                        }
+                    }
+                }
+                return tokens;
+            } else {
+                let items = [];
+                let regex = /<([^>]+)>|([^\s<>]+)/g;
+                let match;
+
+                while ((match = regex.exec(cleanStr)) !== null) {
+                    let nextIndex = regex.lastIndex;
+                    let hasSpaceAfter = nextIndex < cleanStr.length && /\s/.test(cleanStr[nextIndex]);
+
+                    if (match[1] !== undefined) {
+                        items.push({
+                            text: match[1],
+                            isGroup: true,
+                            trailingSpace: hasSpaceAfter
+                        });
+                    } else if (match[2] !== undefined) {
+                        items.push({
+                            text: match[2],
+                            isGroup: false,
+                            trailingSpace: hasSpaceAfter
+                        });
+                    }
+                }
+
+                let flatTokenSyncList = [];
+
+                items.forEach(item => {
+                    let splitTokens = splitSingleUnitByMode(item.text, item.trailingSpace, null, item.isGroup);
+                    if (splitTokens && splitTokens.length > 0) {
+                        flatTokenSyncList.push(...splitTokens);
+                    } else if (item.isGroup) {
+                        flatTokenSyncList.push({
+                            text: item.text,
+                            start: null,
+                            end: null,
+                            cutoffExplicit: false,
+                            trailingSpace: item.trailingSpace
+                        });
+                    } else {
+                        let pipeSplits = item.text.split('|');
+                        let subTokens = [];
+
+                        pipeSplits.forEach((pipeSeg) => {
+                            let hyphenSplits = pipeSeg.split(/(?<=-)/g);
+                            hyphenSplits.forEach((subSeg) => {
+                                if (subSeg) {
+                                    subTokens.push({
+                                        text: subSeg,
+                                        start: null,
+                                        end: null,
+                                        cutoffExplicit: false,
+                                        trailingSpace: false 
+                                    });
+                                }
+                            });
+                        });
+                        
+                        if (subTokens.length > 0) {
+                            let lastSub = subTokens[subTokens.length - 1];
+                            if (!lastSub.text.endsWith('-')) {
+                                lastSub.trailingSpace = item.trailingSpace;
+                            }
+                            flatTokenSyncList.push(...subTokens);
+                        }
+                    }
+                });
+                return flatTokenSyncList;
+            }
+        }
+
+        function parsePipestreamTokens(pipeStr, referenceRawText) {
+            let cleanPipeStr = pipeStr.replace(/^<|>$/g, '').trim();
+            let items = cleanPipeStr.split('|');
+            let tokens = [];
+
+            let targetTokens = [];
+            if (referenceRawText) {
+                let parsedRef = parseTextToTokens(referenceRawText);
+                targetTokens = parsedRef;
+            }
+
+            let currentRefIdx = 0;
+
+            items.forEach((item, index) => {
+                let parts = item.split(':');
+                if (parts.length >= 3) {
+                    let text = parts[0];
+                    let start = parseFloat(parts[1]);
+                    let end = parseFloat(parts[2]);
+
+                    let trailingSpace = false;
+
+                    if (targetTokens.length > 0) {
+                        if (currentRefIdx < targetTokens.length) {
+                            trailingSpace = targetTokens[currentRefIdx].trailingSpace;
+                            currentRefIdx++;
+                        } else {
+                            trailingSpace = true;
+                        }
+                    } else {
+                        let hasHyphenSuffix = text.endsWith('-');
+                        let hasInternalSpaces = /\s/.test(text);
+                        trailingSpace = (!hasHyphenSuffix || hasInternalSpaces) && index < items.length - 1;
+                    }
+
+                    tokens.push({
+                        text: text,
+                        start: isNaN(start) ? null : start,
+                        end: isNaN(end) ? null : end,
+                        cutoffExplicit: !isNaN(end),
+                        trailingSpace: trailingSpace
+                    });
+                }
+            });
+            return tokens;
+        }
+
+        function prepareForSyncingMode(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            const rawText = document.getElementById('rawLyrics').value;
+            if (!rawText.trim()) return alert("Please add lyrics first!");
+
+            const lines = rawText.split('\n').filter(line => line.trim().length > 0);
+            let parsedRows = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                let currentLine = lines[i].trim();
+
+                if (/^<.*:[0-9.]+:[0-9.]+.*>$/.test(currentLine)) {
+                    if (parsedRows.length > 0) {
+                        let targetRow = parsedRows[parsedRows.length - 1];
+                        let pipeTokens = parsePipestreamTokens(currentLine, null);
+                        
+                        if (pipeTokens.length > 0) {
+                            if (pipeTokens.length === targetRow.flatTokens.length) {
+                                for (let k = 0; k < pipeTokens.length; k++) {
+                                    targetRow.flatTokens[k].start = pipeTokens[k].start;
+                                    targetRow.flatTokens[k].end = pipeTokens[k].end;
+                                    targetRow.flatTokens[k].cutoffExplicit = pipeTokens[k].cutoffExplicit;
+                                }
+                            } else {
+                                targetRow.flatTokens = pipeTokens;
+                            }
+
+                            if (pipeTokens[0].start !== null && targetRow.assignedAgent !== 'bg') {
+                                targetRow.lineTimestamp = pipeTokens[0].start;
+                            }
+                        }
+                    }
+                    continue;
+                }
+
+                let lineTimestamp = null;
+                const timeMatch = currentLine.match(/^\[\d+:\d+\.\d+\]/);
+                if (timeMatch) {
+                    lineTimestamp = parseTimestamp(timeMatch[0]);
+                    currentLine = currentLine.replace(/^\[\d+:\d+\.\d+\]/, '').trim();
+                }
+
+                const bgRegex = /\[bg[;:]([^\]]+)\]/i;
+                const bgMatch = currentLine.match(bgRegex);
+                let bgLineText = null;
+                if (bgMatch) {
+                    bgLineText = bgMatch[1].trim();
+                    currentLine = currentLine.replace(bgRegex, '').trim();
+                }
+
+                let determinedAgent = selectedAgent;
+                const agentMatch = currentLine.match(/^(\{agent:([^\}]+)\}|v\d+:|bg:|\{bg\}:|\{[^\}]+\})/i);
+                if (agentMatch) {
+                    let inner = (agentMatch[2] || agentMatch[1]).replace(/[:{}]/g, '').toLowerCase();
+                    if (inner.includes('v1000') || inner.includes('saga')) determinedAgent = 'v1000';
+                    else if (inner.includes('v3')) determinedAgent = 'v3';
+                    else if (inner.includes('v2')) determinedAgent = 'v2';
+                    else if (inner.includes('bg')) determinedAgent = 'bg';
+                    else if (inner.includes('v1')) determinedAgent = 'v1';
+                    currentLine = currentLine.replace(/^(\{agent:[^\}]+\}|v\d+:|bg:|\{bg\}:|\{[^\}]+\})/i, '').trim();
+                }
+
+                let mainTokens = parseTextToTokens(currentLine);
+
+                if (mainTokens.length > 0) {
+                    parsedRows.push({
+                        assignedAgent: determinedAgent,
+                        lineTimestamp: lineTimestamp,
+                        endTimestamp: null,
+                        flatTokens: mainTokens
+                    });
+                }
+
+                if (bgLineText !== null) {
+                    let bgTokens = parseTextToTokens(bgLineText);
+
+                    if (bgTokens.length > 0) {
+                        parsedRows.push({
+                            assignedAgent: 'bg',
+                            lineTimestamp: lineTimestamp, 
+                            endTimestamp: null,
+                            flatTokens: bgTokens
+                        });
+                    }
+                }
+            }
+
+            lyricRows = parsedRows;
+            currentLineIndex = 0;
+            currentWordIndex = 0;
+            if(lyricRows[0]) {
+                selectedAgent = lyricRows[0].assignedAgent;
+                updateAgentButtonsUI(selectedAgent);
+            }
+            renderSyncLines();
+        }
+
+        function renderSyncLines() {
+            const container = document.getElementById('syncWindow');
+            container.innerHTML = '';
+
+            if(lyricRows.length === 0) {
+                container.innerHTML = `<div style="color: #666; text-align: center; padding: 60px 0; background-color: #1e1e22; font-size:16px;">Load lyrics up top to view targets here...</div>`;
+                return;
+            }
+
+            lyricRows.forEach((row, index) => {
+                const div = document.createElement('div');
+                div.className = 'sync-line';
+                if (index === currentLineIndex) div.className += ' active';
+                if (row.lineTimestamp !== null) div.className += ' synced';
+
+                let badge = document.createElement('span');
+                badge.className = `agent-inline-badge badge-${row.assignedAgent}`;
+                badge.innerText = row.assignedAgent;
+                div.appendChild(badge);
+
+                let textWrapper = document.createElement('div');
+                textWrapper.className = 'sync-line-text';
+
+                if (syncType === 'line') {
+                    let textNode = document.createElement('span');
+                    const fullLineText = row.flatTokens.map(t => t.text + (t.trailingSpace ? " " : "")).join('').trim();
+                    textNode.innerText = fullLineText;
+                    textWrapper.appendChild(textNode);
+
+                    if (romanizeEnabled) {
+                        const lineRoman = romanizeTextOffline(fullLineText);
+                        if (lineRoman) {
+                            const romanLineEl = document.createElement('span');
+                            romanLineEl.className = 'line-roman-sub';
+                            romanLineEl.innerText = lineRoman;
+                            textWrapper.appendChild(romanLineEl);
+                        }
+                    }
+                } else {
+                    let flowContainer = document.createElement('span');
+                    flowContainer.className = 'words-container';
+
+                    if (wordSplitMode === 'char') {
+                        flowContainer.style.gap = "2px";
+                    }
+                    row.flatTokens.forEach((tokenObj, targetIdx) => {
+                        let wrapper = document.createElement('span');
+                        wrapper.className = 'word-wrapper';
+                        if (tokenObj.trailingSpace) {
+                            wrapper.style.marginRight = (wordSplitMode === 'char') ? "10px" : "6px";
+                        }
+
+                        const span = document.createElement('span');
+                        span.className = 'word-bubble';
+
+                        const mainLabel = document.createElement('span');
+                        mainLabel.innerText = tokenObj.text;
+                        span.appendChild(mainLabel);
+
+                        if (romanizeEnabled) {
+                            const tokenRoman = romanizeTextOffline(tokenObj.text);
+                            if (tokenRoman) {
+                                span.className += ' has-roman';
+                                const romanSub = document.createElement('span');
+                                romanSub.className = 'pill-roman-sub';
+                                romanSub.innerText = tokenRoman;
+                                span.appendChild(romanSub);
+                            }
+                        }
+                        
+                        let isCurrentlySinging = (tokenObj.start !== null && tokenObj.end === null);
+                        let isFullyStamped = (tokenObj.start !== null && tokenObj.end !== null);
+
+                        if (isCurrentlySinging) {
+                            span.className += ' current-word';
+                        } else if (isFullyStamped) {
+                            span.className += ' stamped';
+                        }
+
+                        let isUpcoming = (index === currentLineIndex && targetIdx === currentWordIndex);
+                        if (isUpcoming && tokenObj.start === null) {
+                            span.className += ' upcoming-cursor';
+                        }
+
+                        if (tokenObj.cutoffExplicit) {
+                            span.className += ' cutoff-marked';
+                        }
+                        
+                        wrapper.appendChild(span);
+                        flowContainer.appendChild(wrapper);
+                    });
+                    textWrapper.appendChild(flowContainer);
+                }
+                
+                div.appendChild(textWrapper);
+
+                if (row.lineTimestamp !== null) {
+                    let tBadge = document.createElement('span');
+                    tBadge.className = 'time-badge';
+                    tBadge.innerText = formatTime(row.lineTimestamp);
+                    div.appendChild(tBadge);
+                }
+                
+                div.onclick = () => handleRowClick(index);
+                container.appendChild(div);
+            });
+            
+            const activeEl = container.querySelector('.active');
+            if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') {
+                return; 
+            }
+
+            if (['0', '1', '2', '3', '4', '5'].includes(e.key)) {
+                e.preventDefault();
+                const agentMap = { '0': 'off', '1': 'v1', '2': 'v2', '3': 'v3', '4': 'bg', '5': 'v1000' };
+                setGlobalAgent(agentMap[e.key]);
+                return;
+            }
+
+            if (e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault(); 
+                if (lyricRows.length > 0) stampEngine();
+            }
+
+            if (e.key === 'v' || e.key === 'V') {
+                e.preventDefault();
+                triggerWordBreak();
+            }
+
+            if (e.key === 'Backspace') {
+                e.preventDefault();
+                undoCurrentLine();
+            }
+        });
+
+        function stampEngineClick(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            stampEngine();
+        }
+
+        function stampEngine() {
+            if (currentLineIndex >= lyricRows.length) return;
+            const currentTime = player.currentTime;
+            let currentRow = lyricRows[currentLineIndex];
+
+            if (syncType === 'line') {
+                if (currentLineIndex > 0 && lyricRows[currentLineIndex - 1].endTimestamp === null) {
+                    lyricRows[currentLineIndex - 1].endTimestamp = currentTime;
+                }
+                
+                if (currentRow.lineTimestamp === null) {
+                    if (currentRow.assignedAgent === 'bg') {
+                        const prevLeadTs = getPreviousLeadLineTimestamp(currentLineIndex);
+                        currentRow.lineTimestamp = (prevLeadTs !== null) ? prevLeadTs : currentTime;
+                    } else {
+                        currentRow.lineTimestamp = currentTime;
+                    }
+                }
+
+                if (currentLineIndex < lyricRows.length - 1) {
+                    currentLineIndex++;
+                    selectedAgent = lyricRows[currentLineIndex].assignedAgent;
+                    updateAgentButtonsUI(selectedAgent);
+                } else {
+                    currentRow.endTimestamp = currentTime + 4.0; 
+                }
+            } else {
+                if (currentRow.flatTokens.length === 0) {
+                    if (currentLineIndex < lyricRows.length - 1) {
+                        currentLineIndex++;
+                        currentWordIndex = 0;
+                        selectedAgent = lyricRows[currentLineIndex].assignedAgent;
+                        updateAgentButtonsUI(selectedAgent);
+                    }
+                    renderSyncLines();
+                    return;
+                }
+
+                if (currentWordIndex >= currentRow.flatTokens.length) {
+                    currentRow.endTimestamp = currentTime;
+                    if (currentRow.flatTokens.length > 0) {
+                        let absoluteLastToken = currentRow.flatTokens[currentRow.flatTokens.length - 1];
+                        if (absoluteLastToken.end === null) {
+                            absoluteLastToken.end = currentTime;
+                        }
+                    }
+
+                    if (currentLineIndex < lyricRows.length - 1) {
+                        currentLineIndex++;
+                        currentWordIndex = 0;
+                        currentRow = lyricRows[currentLineIndex];
+                        selectedAgent = currentRow.assignedAgent;
+                        updateAgentButtonsUI(selectedAgent);
+                        
+                        if (currentRow.flatTokens.length > 0) {
+                            if (currentRow.assignedAgent === 'bg') {
+                                const prevLeadTs = getPreviousLeadLineTimestamp(currentLineIndex);
+                                currentRow.lineTimestamp = (prevLeadTs !== null) ? prevLeadTs : currentTime;
+                            } else {
+                                currentRow.lineTimestamp = currentTime;
+                            }
+                            currentRow.flatTokens[0].start = currentTime;
+                            currentWordIndex = 1; 
+                        }
+                    }
+                    renderSyncLines();
+                    return;
+                }
+
+                if (currentWordIndex === 0) {
+                    if (currentLineIndex > 0 && lyricRows[currentLineIndex - 1].endTimestamp === null) {
+                        lyricRows[currentLineIndex - 1].endTimestamp = currentTime;
+                    }
+                    
+                    if (currentRow.lineTimestamp === null) {
+                        if (currentRow.assignedAgent === 'bg') {
+                            const prevLeadTs = getPreviousLeadLineTimestamp(currentLineIndex);
+                            currentRow.lineTimestamp = (prevLeadTs !== null) ? prevLeadTs : currentTime;
+                        } else {
+                            currentRow.lineTimestamp = currentTime;
+                        }
+                    }
+                }
+
+                if (currentWordIndex > 0) {
+                    let prevToken = currentRow.flatTokens[currentWordIndex - 1];
+                    if (prevToken.end === null) prevToken.end = currentTime;
+                }
+
+                let currentToken = currentRow.flatTokens[currentWordIndex];
+                
+                if (currentToken.start === null) {
+                    currentToken.start = currentTime;
+                }
+                currentToken.end = null; 
+
+                currentWordIndex++;
+            }
+            renderSyncLines();
+        }
+
+        function triggerWordBreak(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            if (syncType !== 'word' || currentLineIndex >= lyricRows.length) return;
+            const currentTime = player.currentTime;
+            let currentRow = lyricRows[currentLineIndex];
+
+            let targetIdx = currentWordIndex - 1;
+            if (targetIdx >= 0 && targetIdx < currentRow.flatTokens.length) {
+                let tokenToCap = currentRow.flatTokens[targetIdx];
+                tokenToCap.end = currentTime;
+                tokenToCap.cutoffExplicit = true;
+                currentRow.endTimestamp = currentTime;
+
+                if (currentWordIndex >= currentRow.flatTokens.length) {
+                    if (currentLineIndex < lyricRows.length - 1) {
+                        currentLineIndex++;
+                        currentWordIndex = 0;
+                        selectedAgent = lyricRows[currentLineIndex].assignedAgent;
+                        updateAgentButtonsUI(selectedAgent);
+                    }
+                }
+            }
+            renderSyncLines();
+        }
+
+        function undoCurrentLine(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            if (lyricRows.length === 0) return;
+
+            let currentLineHasStamps = lyricRows[currentLineIndex] && (lyricRows[currentLineIndex].lineTimestamp !== null || currentWordIndex > 0);
+            let targetRowToWipe = null;
+
+            if (currentLineHasStamps) {
+                targetRowToWipe = lyricRows[currentLineIndex];
+                currentWordIndex = 0;
+            } 
+            else if (currentLineIndex > 0) {
+                currentLineIndex--;
+                targetRowToWipe = lyricRows[currentLineIndex];
+                currentWordIndex = 0;
+                selectedAgent = targetRowToWipe.assignedAgent;
+                updateAgentButtonsUI(selectedAgent);
+            }
+            else if (currentLineIndex === 0) {
+                targetRowToWipe = lyricRows[0];
+                currentWordIndex = 0;
+            }
+
+            if (targetRowToWipe) {
+                if (targetRowToWipe.lineTimestamp !== null) {
+                    let rewindTime = targetRowToWipe.lineTimestamp - 2.0;
+                    player.currentTime = Math.max(0, rewindTime);
+                }
+                
+                targetRowToWipe.lineTimestamp = null;
+                targetRowToWipe.endTimestamp = null;
+                targetRowToWipe.flatTokens.forEach(t => { t.start = null; t.end = null; t.cutoffExplicit = false; });
+            }
+
+            renderSyncLines();
+        }
+
+        function resetSync(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            lyricRows.forEach(row => {
+                row.lineTimestamp = null;
+                row.endTimestamp = null;
+                row.flatTokens.forEach(t => { t.start = null; t.end = null; t.cutoffExplicit = false; });
+            });
+            currentLineIndex = 0;
+            currentWordIndex = 0;
+            if(lyricRows[0]) {
+                selectedAgent = lyricRows[0].assignedAgent;
+                updateAgentButtonsUI(selectedAgent);
+            }
+            renderSyncLines();
+            document.getElementById('finalOutput').value = '';
+        }
+
+        function processCompilation(event) {
+            if (exportFormat === 'normallrc') {
+                exportNormalLRCFormat(event);
+            } else {
+                exportPipestreamLRC(event);
+            }
+        }
+
+        function copyCompiledOutput(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            const outputArea = document.getElementById('finalOutput');
+            if (!outputArea.value.trim()) {
+                alert("Nothing to copy! Click 'Compile & Export' first.");
+                return;
+            }
+            
+            navigator.clipboard.writeText(outputArea.value).then(() => {
+                const copyBtn = document.getElementById('copyBtn');
+                const origText = copyBtn.innerText;
+                copyBtn.innerText = "✅ Copied!";
+                setTimeout(() => { copyBtn.innerText = origText; }, 2000);
+            }).catch(err => {
+                alert("Failed to copy: " + err);
+            });
+        }
+
+        function downloadLRCFile(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            const outputArea = document.getElementById('finalOutput');
+            if (!outputArea.value.trim()) {
+                alert("Nothing to download! Click 'Compile & Export' first.");
+                return;
+            }
+
+            const fileName = currentAudioFilename ? `${currentAudioFilename}.lrc` : 'lyrics.lrc';
+
+            const blob = new Blob([outputArea.value], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        function exportPipestreamLRC(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            let outputText = "";
+
+            lyricRows.forEach(row => {
+                if (row.lineTimestamp === null) return;
+
+                let agentString = "";
+                if (row.assignedAgent === 'v1') agentString = "{agent:v1}";
+                else if (row.assignedAgent === 'v2') agentString = "{agent:v2}";
+                else if (row.assignedAgent === 'v3') agentString = "{agent:v3}";
+                else if (row.assignedAgent === 'bg') agentString = "{bg}";
+                else if (row.assignedAgent === 'v1000') agentString = "{agent:v1000}";
+
+                const finalLineTime = getOffsetAppliedTime(row.lineTimestamp);
+                const timeHeader = formatTime(finalLineTime);
+                
+                let fullRawLineString = row.flatTokens.map(t => t.text + (t.trailingSpace ? " " : "")).join('');
+                outputText += `${timeHeader}${agentString}${fullRawLineString}\n`;
+
+                if (row.flatTokens.some(t => t.start !== null)) {
+                    let lastValidStart = getOffsetAppliedTime(row.lineTimestamp) || 0;
+                    
+                    let pipeTokens = row.flatTokens.map(t => {
+                        let finalStart = getOffsetAppliedTime(t.start);
+                        let finalEnd = getOffsetAppliedTime(t.end);
+                        
+                        let startVal = finalStart !== null ? finalStart : lastValidStart;
+                        let endVal = finalEnd !== null ? finalEnd : startVal;
+                        
+                        lastValidStart = startVal;
+
+                        let startSec = startVal.toFixed(2);
+                        let endSec = endVal.toFixed(2);
+                        
+                        return `${t.text}:${startSec}:${endSec}`;
+                    }).join('|');
+                    
+                    outputText += `<${pipeTokens}>\n`;
+                }
+                outputText += `\n`; 
+            });
+
+            document.getElementById('finalOutput').value = outputText.trim();
+        }
+
+        function formatNormalLRCAgent(assignedAgent) {
+            if (assignedAgent === 'v1') return "v1:";
+            if (assignedAgent === 'v2') return "v2:";
+            if (assignedAgent === 'v1000') return "v1000:";
+            if (assignedAgent === 'v3') return "v3:";
+            return "";
+        }
+
+        function exportNormalLRCFormat(event) {
+            if(event) { event.preventDefault(); event.target.blur(); }
+            let linesArray = [];
+
+            for (let i = 0; i < lyricRows.length; i++) {
+                let row = lyricRows[i];
+                if (row.lineTimestamp === null) continue;
+
+                if (row.assignedAgent === 'bg' && linesArray.length > 0) {
+                    let lastLineIndex = linesArray.length - 1;
+                    
+                    if (row.flatTokens.some(t => t.start !== null)) {
+                        let bgSegment = " [bg:";
+                        let fallbackBgTime = getOffsetAppliedTime(row.lineTimestamp) || 0;
+                        
+                        row.flatTokens.forEach((t, tokenIdx) => {
+                            let spaceSuffix = t.trailingSpace ? " " : "";
+                            let rawStart = t.start !== null ? t.start : fallbackBgTime;
+                            let finalStart = getOffsetAppliedTime(rawStart);
+                            fallbackBgTime = rawStart;
+
+                            let isLastToken = (tokenIdx === row.flatTokens.length - 1);
+                            let rawEnd = t.end !== null ? t.end : (isLastToken ? rawStart + 0.5 : null);
+                            let finalEnd = rawEnd !== null ? getOffsetAppliedTime(rawEnd) : null;
+                            let tokenText = t.text;
+
+                            if (finalStart !== null) {
+                                bgSegment += formatInlineTime(finalStart);
+                                bgSegment += `${tokenText}${spaceSuffix}`;
+                                if (t.cutoffExplicit || isLastToken) {
+                                    let endVal = finalEnd !== null ? finalEnd : (finalStart + 0.5);
+                                    bgSegment += formatInlineTime(endVal);
+                                }
+                            } else {
+                                bgSegment += `${tokenText}${spaceSuffix}`;
+                            }
+                        });
+                        bgSegment = bgSegment.trim() + "]";
+                        linesArray[lastLineIndex] += bgSegment;
+                    } else {
+                        let fullRawLineString = row.flatTokens.map(t => t.text + (t.trailingSpace ? " " : "")).join('');
+                        linesArray[lastLineIndex] += ` [bg:${fullRawLineString.trim()}]`;
+                    }
+                } 
+                
+                else {
+                    let agentPrefix = formatNormalLRCAgent(row.assignedAgent);
+                    let finalLineTime = getOffsetAppliedTime(row.lineTimestamp);
+                    let wordLrcLine = formatTime(finalLineTime) + agentPrefix;
+                    
+                    if (row.flatTokens.some(t => t.start !== null)) {
+                        let fallbackTime = finalLineTime !== null ? finalLineTime : 0;
+                        row.flatTokens.forEach((t, tokenIdx) => {
+                            let spaceSuffix = t.trailingSpace ? " " : "";
+                            let rawStart = t.start !== null ? t.start : fallbackTime;
+                            let finalStart = getOffsetAppliedTime(rawStart);
+                            fallbackTime = rawStart;
+
+                            let isLastToken = (tokenIdx === row.flatTokens.length - 1);
+                            let rawEnd = t.end !== null ? t.end : (isLastToken ? rawStart + 0.5 : null);
+                            let finalEnd = rawEnd !== null ? getOffsetAppliedTime(rawEnd) : null;
+                            let tokenText = t.text;
+
+                            if (finalStart !== null) {
+                                wordLrcLine += formatInlineTime(finalStart);
+                                wordLrcLine += `${tokenText}${spaceSuffix}`;
+                                if (t.cutoffExplicit || isLastToken) {
+                                    let endVal = finalEnd !== null ? finalEnd : (finalStart + 0.5);
+                                    wordLrcLine += formatInlineTime(endVal);
+                                }
+                            } else {
+                                wordLrcLine += `${tokenText}${spaceSuffix}`;
+                            }
+                        });
+                        linesArray.push(wordLrcLine.trim());
+                    } else {
+                        let fullRawLineString = row.flatTokens.map(t => t.text + (t.trailingSpace ? " " : "")).join('');
+                        linesArray.push(`${formatTime(finalLineTime)}${agentPrefix}${fullRawLineString.trim()}`);
+                    }
+                }
+            }
+
+            document.getElementById('finalOutput').value = linesArray.join("\n");
+        }
+    </script>
+</body>
+</html>
