@@ -8,7 +8,7 @@ What it does is to synchronize lyrics to the track currently playing
 
 Functions and shortcuts
 - Basics
-  - Next Line - `Space`
+  - Next Line - `Spacebar`
   - Undo - `Backspace`
   - Paste or Add existing `.txt` or `.lrc`
   - Adding required audio files, any audio files like `.mp3`, `.m4a`, `.flac`, etc
@@ -22,10 +22,11 @@ Functions and shortcuts
   - Romanization button
 
 ## Shortcut Keys
-- `Space` - Next word/next line
+- `Spacebar` - Next word/next line
 - `V` - Word end - Stamps the end time of a word or character
 - `Backspace` - Undo the current line
 - `0...5` - Vocal Roles
+  - `0` - Off
   - `1` - Voice 1
   - `2` - Voice 2
   - `3` - Voice 3
