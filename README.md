@@ -48,8 +48,9 @@ Functions and shortcuts
 **Hot Audio Audition**: Click any already-synced row to instantly jump the audio player back to that line's exact start timestamp.
 
 -----
+<div align="center">
+<h1>Go see site</h1>
 
-# Go see site
 [Visit Site](https://glaze25115.github.io/lyric-syncer-studio/)
 
 Vibe-coded using Gemini AI
