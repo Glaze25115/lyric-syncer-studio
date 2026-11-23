@@ -6,7 +6,7 @@ What it does is to synchronize lyrics to the track currently playing
 
 **Example**: Tapping space adds a timestamps to a line or word, depending on the synchronizing mode.
 
-[Skip over to visit ↡](#go-see-site)
+<h1 align="center"><a href="#go-see-site">Skip over to visit</a></h1>
 
 Functions and shortcuts
 - Basics
